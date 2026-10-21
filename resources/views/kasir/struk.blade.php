@@ -11,9 +11,11 @@
         .line { border-top: 1px dashed #000; margin: 10px 0; }
         table { width: 100%; border-collapse: collapse; }
         th, td { padding: 2px 0; }
-        .btn-print { display: block; width: 100%; padding: 10px; background: #0d6efd; color: white; border: none; cursor: pointer; margin-top: 20px; font-weight: bold; }
+        .btn { display: block; width: 100%; padding: 10px; color: white; border: none; cursor: pointer; margin-top: 10px; font-weight: bold; text-align: center; text-decoration: none; box-sizing: border-box; }
+        .btn-print { background: #0d6efd; }
+        .btn-pdf { background: #dc3545; }
         @media print {
-            .btn-print { display: none; }
+            .btn { display: none; }
             body { margin: 0; padding: 0; }
         }
     </style>
@@ -68,7 +70,13 @@
         <p>Barang yang sudah dibeli tidak dapat ditukar/dikembalikan.</p>
     </div>
 
-    <button class="btn-print" onclick="window.print()">🖨️ CETAK STRUK</button>
+    <!-- Tombol Download PDF -->
+    <a href="{{ route('kasir.download-pdf', $transaction->id) }}" class="btn btn-pdf">
+        📄 DOWNLOAD PDF
+    </a>
+
+    <!-- Tombol Cetak Biasa -->
+    <button class="btn btn-print" onclick="window.print()">🖨️ CETAK STRUK</button>
 
 </body>
 </html>

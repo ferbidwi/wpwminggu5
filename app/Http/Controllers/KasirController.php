@@ -8,6 +8,7 @@ use App\Models\Transaction;
 use App\Models\TransactionDetail;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class KasirController extends Controller
 {
@@ -41,7 +42,6 @@ class KasirController extends Controller
         try {
             DB::beginTransaction();
 
-            // CEK STOK DULU
             foreach ($request->items as $item) {
                 $product = Product::find($item['id']);
                 if (!$product || $product->stock < $item['qty']) {
@@ -53,7 +53,6 @@ class KasirController extends Controller
                 }
             }
 
-            // Generate Nomor Transaksi Sequential
             $today = date('Ymd');
             $lastTrx = Transaction::whereDate('created_at', today())->count();
             $trxNumber = 'TRX-' . $today . '-' . str_pad($lastTrx + 1, 3, '0', STR_PAD_LEFT);
@@ -108,12 +107,10 @@ class KasirController extends Controller
         return view('kasir.struk', compact('transaction'));
     }
 
-    // HALAMAN RIWAYAT TRANSAKSI
     public function riwayat(Request $request)
     {
         $query = Transaction::with('details')->orderBy('created_at', 'desc');
 
-        // Filter by tanggal
         if ($request->filled('dari')) {
             $query->whereDate('created_at', '>=', $request->dari);
         }
@@ -127,10 +124,23 @@ class KasirController extends Controller
         return view('kasir.riwayat', compact('transactions', 'totalPendapatan'));
     }
 
-    // DETAIL TRANSAKSI (dari riwayat)
     public function detail($id)
     {
         $transaction = Transaction::with('details')->findOrFail($id);
         return view('kasir.struk', compact('transaction'));
+    }
+
+    // ==========================================
+    // TAMBAHAN ACARA 30: DOWNLOAD INVOICE PDF
+    // ==========================================
+    public function downloadPdf($id)
+    {
+        $transaction = Transaction::with('details', 'user')->findOrFail($id);
+        
+        // Load view 'invoice_pdf' dan passing data transaksi
+        $pdf = Pdf::loadView('invoice_pdf', compact('transaction'));
+        
+        // Download file dengan nama yang rapi
+        return $pdf->download('Invoice-' . $transaction->transaction_number . '.pdf');
     }
 }

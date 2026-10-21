@@ -1,9 +1,10 @@
 <?php
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB; // <-- TAMBAHKAN IMPORT INI
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BukuController;
 use App\Http\Controllers\KasirController;
+use App\Http\Controllers\ProductController; // <-- Tambahan Import ProductController
 use App\Models\Product;
 use App\Models\Transaction;
 use App\Models\TransactionDetail;
@@ -34,11 +35,15 @@ Route::middleware('auth')->group(function () {
     // CRUD BUKU
     Route::resource('buku', BukuController::class);
 
+    // CRUD PRODUCTS (Tambahan Acara 29)
+    Route::resource('products', ProductController::class);
+
     // KASIR
     Route::get('/kasir', [KasirController::class, 'index'])->name('kasir.index');
     Route::get('/api/cari-produk', [KasirController::class, 'search'])->name('kasir.search');
     Route::post('/kasir/transaksi', [KasirController::class, 'store'])->name('kasir.store');
     Route::get('/kasir/struk/{id}', [KasirController::class, 'cetakStruk'])->name('kasir.struk');
+    Route::get('/kasir/download-pdf/{id}', [KasirController::class, 'downloadPdf'])->name('kasir.download-pdf');
     Route::get('/kasir/riwayat', [KasirController::class, 'riwayat'])->name('kasir.riwayat');
     Route::get('/kasir/detail/{id}', [KasirController::class, 'detail'])->name('kasir.detail');
 
